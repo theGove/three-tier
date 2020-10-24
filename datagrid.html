@@ -1,21 +1,12 @@
 <html lang="en">
 <head>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel = "stylesheet" type = "text/css"  href = "style.css" />
     <title>datagrid</title>
-    <script>
-        async function test(){
-            try {
-                const res = await axios.get('https://script.google.com/macros/s/AKfycbxjS_rAupJx9G4nmYhe8C2poQH6bn_UoUV2puF9k0I/dev?table=Door&limit=2')
-                alert(res.data)
-            } catch (e) {
-                console.error(e);
-            }
-        }
-    </script>
+    <script src="datagrid.js"></script>
 </head>
-<body>
-  <button onclick="test()">test axios</button>
+<body onload="start_me_up()">
+    <div id="data"></div>
 </body>
 </html>
