@@ -1,12 +1,15 @@
 // these are the two URLs google apps scripts gives you for your web app.  One for development and one for production
-const dev_prefix="https://script.google.com/macros/s/AKfycbxjS_rAupJx9G4nmYhe8C2poQH6bn_UoUV2puF9k0I/dev"
-const prod_prefix="https://script.google.com/macros/s/AKfycbw-QDAs00qBmVbvINTipLA4OvR_Zv83P2IoyH-Vp6GRcEWLhMU/exec"
-const prefix=dev_prefix
+// You will get these values when you publish your google apps script as a web app
+const dev_prefix=""  // look like this:  https://script.google.com/macros/s/ZKfycbxjS_raPupJx9G4nmYhe8C2poQH6bn_UoUV2puF9k0I/dev
+const prod_prefix="" // looks like this: https://script.google.com/macros/s/XKfycbw-QDAs00bQmVbvINTipLA4OvR_Zv83P2IoyH-Vp6GRcEWLhMU/exec
+let prefix=dev_prefix // set this to configure you code for working with your dev or production code on google apps script
+
 const dealy_seconds = 4 // how long data validation messages are visible
 
 //example call: file:///C:/Users/Gove/three-tier/datagrid.html?employee
 
 function start_me_up(){  // runs when the body has loaded
+    if(!prefix){prefix=prompt("Enter your Google Apps Web App access point.")}
     const table=window.location.search.substr(1)               // read the table from the url
     if(table){
         get_data(table)                                        // a table has been specified in the URL, open it
