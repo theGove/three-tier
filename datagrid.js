@@ -3,7 +3,6 @@
 const dev_prefix=""  // look like this:  https://script.google.com/macros/s/ZKfycbxjS_raPupJx9G4nmYhe8C2poQH6bn_UoUV2puF9k0I/dev
 const prod_prefix="" // looks like this: https://script.google.com/macros/s/XKfycbw-QDAs00bQmVbvINTipLA4OvR_Zv83P2IoyH-Vp6GRcEWLhMU/exec
 let prefix=dev_prefix // set this to configure you code for working with your dev or production code on google apps script
-
 const dealy_seconds = 4 // how long data validation messages are visible
 
 //example call: file:///C:/Users/Gove/three-tier/datagrid.html?employee
