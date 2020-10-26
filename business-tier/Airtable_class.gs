@@ -13,9 +13,11 @@ class Airtable {
     this.airtable_baseid = "yourBaseIDhere" // example: appYpPMqTs05719pH
   }
   
-  // ----------------  Class Methods  ----------------
+    // ----------------  Class Methods  ----------------
   get_data(limit) {
     //gets the specified number of records from the table this class is configured to work with at aritable
+    log("at Airtable get_date","----limit----",limit)
+
     if(!limit){limit=100}
     const url = this.api+this.airtable_baseid+'/'+this.table+'?maxRecords='+limit+'&view=Grid%20view';
     const options = {
@@ -32,6 +34,8 @@ class Airtable {
   
   get_record(id) {
     //gets the specified record from the specified table at aritable
+    log("at Airtable get_record","----id----",id)
+    
     const url = this.api+this.airtable_baseid+'/'+this.table+'/'+id;
     const options = {
       "headers" : {
@@ -48,6 +52,7 @@ class Airtable {
   
   update_data(record_id, field_name, value) {
     //updates a field on a record
+    log("at Airtable update_data","----record_id----",record_id,"----field_name----",field_name,"----value----", value)
     
     const url = this.api+this.airtable_baseid+'/'+this.table
     
@@ -85,14 +90,25 @@ class Airtable {
     }
     
   }
+  
+  validation_message(new_value, error_message){
+    // builds the message to be returned after data validation
+    log("at Airtable validation_message","----new_value----",new_value,"----error_message----",error_message)
+      return{value:new_value,
+             error:{message:error_message,
+                    type:"INVALID_VALUE_FOR_COLUMN"}
+            }
+  }
 
   
   toProperCase (txt) {  // retrns the proper case analog of txt
+    log("at Airtable toProperCase","----txt----",txt)
     return txt.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
   };
 
   validate_phone_number(phone_number){
     // if the phone_number includes exactly 10 numbers, returns a properly formatted phone number, otherwise, null
+    log("at Airtable validate_phone_number","----phone_number----",phone_number)
     const data = phone_number.replace(/\D/g,'');
     if(data.length===10){
       return data.substr(0,3)+"-"+data.substr(3,3)+"-"+data.substr(6,4)

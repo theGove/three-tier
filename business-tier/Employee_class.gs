@@ -11,14 +11,16 @@ class Employee extends Airtable {
 
   get_structure() {
     // returns default labels and widths for each field in the table
+    log("at Employee get_structure")
+
     return [
         {name:"first_name",width:15,label:"First Name"},
-        {name:"last_name",width:15,label:"Last Name"},
-        {name:"address",width:25,label:"Address"},
-        {name:"city",width:10,label:"City"},
-        {name:"state",width:4,label:"State"},
-        {name:"phone",width:10,label:"Phone"},
-        {name:"hire_date",width:10,label:"Date Hired"},
+        {name:"last_name" ,width:15,label:"Last Name"},
+        {name:"address"   ,width:25,label:"Address"},
+        {name:"city"      ,width:10,label:"City"},
+        {name:"state"     ,width:4, label:"State"},
+        {name:"phone"     ,width:10,label:"Phone"},
+        {name:"hire_date" ,width:10,label:"Date Hired"},
         {name:"birth_date",width:10,label:"Birthday"}
     ]
   }
@@ -26,8 +28,10 @@ class Employee extends Airtable {
 
   
   validate_data(record_id, field_name, value) {
-    
-    // standard message configuration in case we need to return the message
+    // validates the data according to the rules here if all validation rules pass
+    // updates the data; otherwise, returns message describing why the data was not updated
+
+    log("at Employee validate_data","----record_id----",record_id,"----field_name----",field_name,"----value----",value)
     
     switch(field_name){
       case "birth_date":
@@ -36,11 +40,8 @@ class Employee extends Airtable {
           const date_now = new Date()
           const date_born  = new Date(value)
           if ((date_now-date_born)/(1000*60*60*24*365.25)<18){
-            return{value:this.get_record(record_id).fields[field_name],
-                   error:{message:"Date of Birth must be at least 18 years before today",
-                          type:"INVALID_VALUE_FOR_COLUMN",
-                         }
-                  }// end of message being returned
+            this.validation_message(this.get_record(record_id).fields[field_name]
+                                  ,"Date of Birth must be at least 18 years before today")
           }
         }
         break // end of case birth_date
@@ -52,11 +53,8 @@ class Employee extends Airtable {
           const date_born  = new Date(record.fields.birth_date)
           if ((date_hired-date_born)/(1000*60*60*24*365.25)<18){
             // employee is less than 18 years old when hired, disallow
-            return{value:record.fields.hire_date,
-                   error:{message:"Date hired must be at least 18 years after birth date",
-                          type:"INVALID_VALUE_FOR_COLUMN",
-                         }
-                  }// end of message being returned
+            this.validation_message(record.fields.hire_date
+                                  ,"Date hired must be at least 18 years after birth date")
           }
         }
         break // end of case hire_date
@@ -67,11 +65,8 @@ class Employee extends Airtable {
             //the number has been formatted
             value=new_number
           }else{
-            return{value:this.get_record(record_id).fields[field_name],
-                   error:{message:"Phone number must have 10 numeric digits",
-                          type:"INVALID_VALUE_FOR_COLUMN",
-                         }
-                  }// end of message being returned
+            this.validation_message(this.get_record(record_id).fields[field_name]
+                                  ,"Phone number must have 10 numeric digits")
           }
         }
         break // end of case phone
@@ -81,11 +76,8 @@ class Employee extends Airtable {
             //data is valid, make it uppercase
             value=value.toUpperCase()
           }else{
-            return{value:this.get_record(record_id).fields[field_name],
-                   error:{message:"State must be 2 characters",
-                          type:"INVALID_VALUE_FOR_COLUMN",
-                         }
-                  }// end of message being returned
+            this.validation_message(this.get_record(record_id).fields[field_name]
+                                  ,"State must be 2 characters")
           }
         }
         break // end of case state
@@ -97,11 +89,8 @@ class Employee extends Airtable {
         }else{
           // Do not allow last name to be empty
           const record=this.get_record(record_id)
-          return{value:this.get_record(record_id).fields[field_name],
-                 error:{message:"Last Name is not allowed to be empty",
-                        type:"INVALID_VALUE_FOR_COLUMN",
-                       }
-                }// end of message being returned
+            this.validation_message(this.get_record(record_id).fields[field_name]
+                                  ,"Last Name is not allowed to be empty")
         }
         break// end of case last_name
       case "first_name":

@@ -27,7 +27,10 @@ function get_data(table){ // get data from airtable for the specified table usin
 }
 
 function show_data(){  // the function that is executed when table data arrives
+    if(data.exception){show_exception();return}          // there was an exception in the google apps script, show the message and exit
+
     const table=document.createElement('table')          // make a new TABLE element
+    const static=[]                                      // build an array to keep track of which fields are read only
     table.id="data-table"                                // set the ID of the table
     let thead = table.createTHead();                     // build the table heading
     let row = thead.insertRow();                         // put a row in the table heading
@@ -36,30 +39,37 @@ function show_data(){  // the function that is executed when table data arrives
         let text = document.createTextNode(field.label); // create a text node to hold the name of the column
         th.appendChild(text);                            // put the field label text node in the column header
         row.appendChild(th);                             // put the TH tag into the row
+        if(field.static){static.push(field.name)}        // if a field is marked as static, add it to the read-only list
     }
     let tbody = table.createTBody();                     // build the table body--now rows yet
     document.getElementById('data').appendChild(table)   // put the table onto the document
     for(const record of data.records){                   // itreate over the records received 
-        add_row(record, tbody)                           // and make a row for each record received
+        add_row(record, tbody, static)                   // and make a row for each record received
     }    
 }
 
-function add_row(record, body){ // adds a row to the table body specified using data from record
-    let row = body.insertRow()                                     // make a new row on the table
-    for(const field of data.structure){                            // iterate over the data structure
-        add_cell(field, record.fields[field.name], row, record.id) // build a cell for each field in the data structure
+function add_row(record, body, static){ // adds a row to the table body specified using data from record
+    let row = body.insertRow()                                           // make a new row on the table
+    for(const field of data.structure){                                  // iterate over the data structure
+        add_cell(field, record.fields[field.name], row, record.id,static)// build a cell for each field in the data structure
     }
 }
 
-function add_cell(field, value, row, id){ // adds a cell to a row
-    let cell = row.insertCell();                        // make a new TD element in the table row
-    const input=document.createElement('input')         // make an INPUT tag to put in the cell so the data is editable
-    input.type="text"                                   // set the type of the INPUT so this will be editable data
-    if(value!=undefined){input.value=value}             // if a value was passed in, put it in the value of the INPUT tag
-    input.size = field.width                            // set the size of the input tag width specified
-    input.onchange = change_value                       // confiture the INPUT tag so that it will execute the change_value function when the user changes the value 
-    input.id = data.table + "-" + id + "-" + field.name // set up the id of of the INPUT tag so we know just what data to change in the database
-    cell.appendChild(input);                            // put the fully configured INPUT tag into the cell
+function add_cell(field, value, row, id, static){ // adds a cell to a row
+    let cell = row.insertCell();                            // make a new TD element in the table row
+    if(static.includes(field.name)){
+        cell.className = "read-only"                        // set the cell to appear as a read only column
+        let text = document.createTextNode(value);          // create a text node to hold the value of the cell
+        cell.appendChild(text);                             // put the field value text node in the table cell
+    }else{                                                  // field is allowed to be edited
+        const input=document.createElement('input')         // make an INPUT tag to put in the cell so the data is editable
+        input.type="text"                                   // set the type of the INPUT so this will be editable data
+        if(value!=undefined){input.value=value}             // if a value was passed in, put it in the value of the INPUT tag
+        input.size = field.width                            // set the size of the input tag width specified
+        input.onchange = change_value                       // confiture the INPUT tag so that it will execute the change_value function when the user changes the value 
+        input.id = data.table + "-" + id + "-" + field.name // set up the id of of the INPUT tag so we know just what data to change in the database
+        cell.appendChild(input);                            // put the fully configured INPUT tag into the cell
+    }    
 }
 
 function change_value(){ // is triggered when a user changes a value in a cell of the table
@@ -78,33 +88,46 @@ function change_value(){ // is triggered when a user changes a value in a cell o
                + encodeURIComponent(this.value)
                + "&time=" + Date.now()    
     document.head.appendChild(script)                    // add the script the document heading
- }
+}
 
  function handle_message(){ // deals with the data returned after updating (or failing to update) a column value on airtable through google apps script
-    const tag = document.getElementById(message.table + "-"      // find the INPUT tag that has the data the user entered
-                                      + message.record + "-" 
-                                      + message.field)
-    if(message.error){                                           // see if the message that came back from google apps script has an error message
+    console.log("data",data)
+    if(data.exception){show_exception();return}                  // there was an exception in the google apps script, show the message and exit
+    
+    const tag = document.getElementById(data.table + "-"         // find the INPUT tag that has the data the user entered
+                                      + data.record + "-" 
+                                      + data.field)
+    if(data.error){                                              // see if the message that came back from google apps script has an error message
       tag.className="error"                                      // there is a error message, so make the INPUT tag look like an error (red background) by default, but you could change it in style.css
       const row=tag.parentElement.parentElement                  // get a reference to the row that contatins the cell that contains the INPUT tag that the user changed
       const table = document.getElementById("data-table")        // get a reference to the table that holds the data
       const cell = table.insertRow(row.rowIndex+1).insertCell(0) // insert a row after the row that hold the field the user changed AND insert a cell on the row
-      cell.innerHTML = message.error.message                     // put the the error message in the newly added cell
+      cell.innerHTML = data.error.message                        // put the the error message in the newly added cell
       cell.colSpan=row.cells.length                              // make the cell span the whole width of the table 
       cell.className="message"                                   // put the right class so it will be styled according to style.css
       let delay=setInterval(function(){                          // initiate the function to clear the message after the nubmer of seconds specified atop this file
-        if(message.value){                                       // Google apps script sent back a value to replace the users entered value.  This could be becuase it is reverting to a prior value or because it formatted what the user entered  
+        if(data.value){                                          // Google apps script sent back a value to replace the users entered value.  This could be becuase it is reverting to a prior value or because it formatted what the user entered  
             tag.className=""                                     // change the style of the INPUT tag to be normal data
-            tag.value=message.value                              // replace the value the user entered with the value passed back from google apps script
+            tag.value=data.value                                 // replace the value the user entered with the value passed back from google apps script
         }else{                                                   // there was no value passed back from google apps script
             tag.focus()                                          // set the focus to the INPUT tag, but leave it formatted as an error and leave the value the user typed.  It needs work.
         }
         table.deleteRow(row.rowIndex+1)                          // delete the row in the table added to show the error message
         clearInterval(delay)                                     // prevent another call to this function because it has been handled
       }, dealy_seconds*1000);                                    // part of the initial call to clear the message.  This line specifies how long to wait to clear the message
-    }else{
-        tag.value=message.value                                  // there was no error message, just update the value with what google apps script passed back
+    }else{                                                       // there is no error message, just update with any correction that came back 
+        if(data.value){                                        
+            tag.value=data.value                                 // there is a value sent back. update the value in the INPUT tag
+        }else{
+            tag.value=""                                         // there is no value sent back. clear the INPUT tag
+        }
         tag.className=""                                         // remove the "pending" class from the INPUT tag so the field looks like regular data again
     }
+}
+
+function show_exception(){
+    const tag = document.getElementById("exception")
+    tag.innerHTML = data.exception
+    tag.style.display = "block"
 }
 

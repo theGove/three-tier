@@ -1,5 +1,8 @@
-table {
+body{
     font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+table {
     border-collapse: collapse;
     border: 1px solid black;
 }
@@ -15,7 +18,11 @@ th {
     background-color: #800000;
     color: white;
     border: 1px solid black;
+    position: sticky;
+    top: 0;
 }
+
+  
 
 input {
     padding:2px;  
@@ -28,11 +35,21 @@ input {
     font-weight: 500;
     color: white;
 }
+
 .pending{
     background-color: #ddd;
     font-weight: normal;
     color: black;
 }
+
+.read-only{
+    background-color: #ddd;
+    font-weight: normal;
+    color: #555;
+    font-size: .8rem;
+    padding:2px;  
+}
+
 .message{
     background-color: #ddd;
     font-weight: 500;
@@ -41,3 +58,13 @@ input {
     padding:1rem;
 
 }
+
+#exception{
+    margin: 1rem;
+    padding:1rem;
+    background-color: rgb(200, 0, 0);
+    color:white;
+    font-weight: 500;
+    display:none
+}
+
