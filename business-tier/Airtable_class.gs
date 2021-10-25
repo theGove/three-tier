@@ -5,18 +5,18 @@ class Airtable {
     
     // 1. Browe to https://airtable.com/account
     // 2. Search for "This is your personal API key."
-    this.airtable_token = "yourAirtableAPIkeyHere"  // example: keybjiCcpZu1h4L6C
+    this.airtable_token = "yourAirtableAPIkeyHere"  // starts with "key" and looks like: keybjiCcpZu1h4L6C
     
     // 1. Browse to https://airtable.com/api
     // 2. Click on the base you want to use
     // 3. Search for "The ID of this base is"
-    this.airtable_baseid = "yourBaseIDhere" // example: appYpPMqTs05719pH
+    this.airtable_baseid = "yourBaseIDhere" // starts with "app" and looks like: appYpPMqTs05719pH
   }
   
-    // ----------------  Class Methods  ----------------
+      // ----------------  Class Methods  ----------------
   get_data(limit) {
     //gets the specified number of records from the table this class is configured to work with at aritable
-    log("at Airtable get_date","----limit----",limit)
+    log("at Airtable get_data","----limit----",limit)
 
     if(!limit){limit=100}
     const url = this.api+this.airtable_baseid+'/'+this.table+'?maxRecords='+limit+'&view=Grid%20view';
@@ -29,6 +29,7 @@ class Airtable {
     const data = JSON.parse(response.getContentText())
     data.structure = this.get_structure()
     data.table = this.table
+    log("data", data)
     return data;
   }
   

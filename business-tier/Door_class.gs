@@ -33,6 +33,7 @@ class Door extends Airtable {
      
            break
       case "door_style":
+           const allowed_styles="bifold bypass flush french panel pocket"
            switch(value.toLowerCase()){
               case'bi':value="bifold";break
               case'by':value="bypass";break
@@ -44,6 +45,10 @@ class Door extends Airtable {
                                                       ,field_name + " is not allowed to be empty")
            }
           value=value.toLowerCase()
+          if(! allowed_styles.includes(value)){
+            return this.validation_message(this.get_record(record_id).fields[field_name]
+                                                      , "Style must be one of: " + allowed_styles)
+          }
           break
       case "color":value=this.toProperCase(value)
           break

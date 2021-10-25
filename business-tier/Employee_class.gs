@@ -21,7 +21,8 @@ class Employee extends Airtable {
         {name:"state"     ,width:4, label:"State"},
         {name:"phone"     ,width:10,label:"Phone"},
         {name:"hire_date" ,width:10,label:"Date Hired"},
-        {name:"birth_date",width:10,label:"Birthday"}
+        {name:"birth_date",width:10,label:"Birthday"},
+        {name:"photo",width:10,label:"Photo"}
     ]
   }
 

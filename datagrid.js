@@ -1,8 +1,9 @@
 // these are the two URLs google apps scripts gives you for your web app.  One for development and one for production
 // You will get these values when you publish your google apps script as a web app
-const dev_prefix=""  // look like this:  https://script.google.com/macros/s/ZKfycbxjS_raPupJx9G4nmYhe8C2poQH6bn_UoUV2puF9k0I/dev
-const prod_prefix="" // looks like this: https://script.google.com/macros/s/XKfycbw-QDAs00bQmVbvINTipLA4OvR_Zv83P2IoyH-Vp6GRcEWLhMU/exec
-let prefix=dev_prefix // set this to configure you code for working with your dev or production code on google apps script
+
+
+// URL to your production code when you publish yoru google app script as a web app
+let prefix="YourGoogleAppsScriptWebAppURLHere" // looks like: https://script.google.com/macros/s/AKfycbz90JgtbAjrjz8c8WQGjgy8kM2GtdCAulom8XWOQyGoeX8DXM5XsmUMAcSYSSyZwwNSLq/exec
 const dealy_seconds = 4 // how long data validation messages are visible
 
 //example call: file:///C:/Users/Gove/three-tier/datagrid.html?employee
@@ -61,6 +62,20 @@ function add_cell(field, value, row, id, static){ // adds a cell to a row
         cell.className = "read-only"                        // set the cell to appear as a read only column
         let text = document.createTextNode(value);          // create a text node to hold the value of the cell
         cell.appendChild(text);                             // put the field value text node in the table cell
+    }else if(Array.isArray(value)){                         // check to see if the field is an array of values.  If so, treat it differntly.  For now, the only type we are handling is images
+        for(const entry of value){                          // loop through the entries in the array 
+            if(entry.url){                                  // if the entry has a url property, assume it is a picture
+              const img = new Image();                      // make a new image object in the HTML document
+              img.src = entry.url                           // set the source of the image
+              img.height = 15                               // set the height of the image so it will fit in a cell
+              const anchor = document.createElement('a')    // make an achor tag so we can link to the full image
+              anchor.href = entry.url                       // set the link our anchor will follow
+              anchor.target = "_blank"                      // set the target to open the link in a new tab
+              anchor.appendChild(img)                       // put the image in the anchor
+              cell.appendChild(anchor)                      // put the anchor in the cell
+            }
+            cell.appendChild(document.createTextNode(" "))  // add a space so the images are not crammed together
+        }
     }else{                                                  // field is allowed to be edited
         const input=document.createElement('input')         // make an INPUT tag to put in the cell so the data is editable
         input.type="text"                                   // set the type of the INPUT so this will be editable data
@@ -68,7 +83,7 @@ function add_cell(field, value, row, id, static){ // adds a cell to a row
         input.size = field.width                            // set the size of the input tag width specified
         input.onchange = change_value                       // confiture the INPUT tag so that it will execute the change_value function when the user changes the value 
         input.id = data.table + "-" + id + "-" + field.name // set up the id of of the INPUT tag so we know just what data to change in the database
-        cell.appendChild(input);                            // put the fully configured INPUT tag into the cell
+        cell.appendChild(input)                             // put the fully configured INPUT tag into the cell
     }    
 }
 
