@@ -1,9 +1,6 @@
-// these are the two URLs google apps scripts gives you for your web app.  One for development and one for production
-// You will get these values when you publish your google apps script as a web app
-
-
 // URL to your production code when you publish yoru google app script as a web app
-let prefix="YourGoogleAppsScriptWebAppURLHere" // looks like: https://script.google.com/macros/s/AKfycbz90JgtbAjrjz8c8WQGjgy8kM2GtdCAulom8XWOQyGoeX8DXM5XsmUMAcSYSSyZwwNSLq/exec
+// You will get this URL when you publish your google apps script as a web app
+let prefix="YourWebAppURLHere" // looks like: https://script.google.com/macros/s/AKfycbz90JgtbAjrjz8c8WQGjgy8kM2GtdCAulom8XWOQyGoeX8DXM5XsmUMAcSYSSyZwwNSLq/exec
 const dealy_seconds = 4 // how long data validation messages are visible
 
 //example call: file:///C:/Users/Gove/three-tier/datagrid.html?employee
