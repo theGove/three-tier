@@ -85,6 +85,21 @@ function add_cell(field, value, row, id, static){ // adds a cell to a row
 }
 
 function change_value(){ // is triggered when a user changes a value in a cell of the table
+    const params=this.id.split("-")                      // split the INPUT tag's id into its component parts
+    switch(params[0]){                                   // Presentation layer data validation. params[0] is the table name
+        case "Employee":                                 // validating fields in the employee table  
+            switch(params[2]){                           // params[2] is the field name 
+                case "first_name":                       // validating the first_name field of the employee table  
+                    console.log("changing first name")
+                    break
+                default:    
+            }
+            break
+        case "Door":                                     // validating fields in the door table
+            break
+        default:        
+    }
+
     this.className="pending"                             // change the class of the INPUT tag holding the data to give a visiual cue that the data has not yet been written to the database
     if(document.getElementById('data-script')){          // if we have already fetched data using this script tag, remove the old one
         document.getElementById('data-script').remove()
@@ -92,7 +107,6 @@ function change_value(){ // is triggered when a user changes a value in a cell o
     const script = document.createElement('script')      // create a new script tag to receive the data from google apps script
     script.id="data-script"                              // set the id so we can refer to it later  
     script.onload = handle_message                       // configure the script so that it will execute the handle_message fucntion when it has been update
-    const params=this.id.split("-")                      // split the INPUT tag's id into its component parts
     script.src=prefix                                    // set the source of the script so it will call the google apps script with the appropriate parameters
                + "?mode=update&table=" + params[0]  
                + "&record=" + params[1] + "&field=" 
